@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Elevare AI Health App</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      transition: 0.3s;
+    }
+
+    /* LOGIN */
+    .login-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .login-box {
+      background: white;
+      padding: 40px;
+      width: 380px;
+      border-radius: 18px;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.15);
+      text-align: center;
+    }
+
+    .login-box h1 {
+      font-size: 32px;
+      color: #2ecc71;
+      margin-bottom: 10px;
+    }
+
+    .login-box input {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+    }
+
+    .login-box button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #2ecc71;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    /* APP LAYOUT */
+    .app-container {
+      display: none;
+      height: 100vh;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: linear-gradient(to bottom, #2ecc71, #27ae60);
+      padding: 25px;
+      color: white;
+    }
+
+    .sidebar h1 {
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    .sidebar a {
+      display: block;
+      padding: 12px;
+      margin: 8px 0;
+      text-decoration: none;
+      color: white;
+      border-radius: 10px;
+    }
+
+    .sidebar a:hover {
+      background: rgba(255,255,255,0.25);
+    }
+
+    .logout-btn {
+      margin-top: 30px;
+      background: #e74c3c;
+      padding: 12px;
+      border-radius: 10px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .logout-btn:hover {
+      background: #c0392b;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .page {
+      display: none;
+    }
+
+    .active {
+      display: block;
+    }
+
+    .header h2 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      color: gray;
+      margin-bottom: 20px;
+    }
+
+    /* DASHBOARD CARDS */
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .card span {
+      font-size: 24px;
+      font-weight: bold;
+      color: #2ecc71;
+    }
+
+    /* FORM */
+    .form-box {
+      background: white;
+      padding: 25px;
+      border-radius: 18px;
+      max-width: 600px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+    }
+
+    label {
+      font-weight: 600;
+      display: block;
+      margin-top: 15px;
+    }
+
+    input[type="range"], select {
+      width: 100%;
+      margin-top: 8px;
+      padding: 6px;
+      border-radius: 8px;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 12px;
+      background: #2ecc71;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #27ae60;
+    }
+
+    /* AI OUTPUT */
+    .ai-card {
+      padding: 18px;
+      border-radius: 15px;
+      margin-top: 15px;
+      background: #eaffea;
+      border-left: 6px solid #2ecc71;
+      white-space: pre-line;
+    }
+
+    /* REPORT HISTORY */
+    .report-item {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+      white-space: pre-line;
+    }
+
+    /* DARK MODE */
+    body.dark {
+      background: #121212;
+    }
+
+    body.dark .form-box,
+    body.dark .login-box,
+    body.dark .report-item,
+    body.dark .card {
+      background: #1e1e1e;
+      color: white;
+    }
+
+    body.dark p,
+    body.dark label {
+      color: lightgray;
+    }
+
+    body.dark .sidebar {
+      background: linear-gradient(to bottom, #111, #222);
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- LOGIN PAGE -->
+<div class="login-container" id="loginPage">
+  <div class="login-box">
+    <h1>🌿 Elevare</h1>
+    <p>Login to continue</p>
+    <input placeholder="Username">
+    <input type="password" placeholder="Password">
+    <button onclick="login()">Login</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app-container" id="appPage">
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h1>🌿 Elevare</h1>
+
+    <a href="#" onclick="goToPage('dashboard')">🏠 Dashboard</a>
+    <a href="#" onclick="goToPage('dailyInput')">📊 Daily Input</a>
+    <a href="#" onclick="goToPage('aiInsights')">🤖 AI Insights</a>
+    <a href="#" onclick="goToPage('reports')">📈 Reports</a>
+    <a href="#" onclick="goToPage('settings')">⚙️ Settings</a>
+
+    <div class="logout-btn" onclick="logout()">🚪 Logout</div>
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="page active">
+      <div class="header">
+        <h2>Dashboard</h2>
+        <p>Your latest health summary</p>
+      </div>
+
+      <div class="cards">
+        <div class="card"><h3>Health Score</h3><span id="dashScore">--</span></div>
+        <div class="card"><h3>Sleep Status</h3><span id="dashSleep">--</span></div>
+        <div class="card"><h3>Hydration</h3><span id="dashWater">--</span></div>
+        <div class="card"><h3>Stress Level</h3><span id="dashStress">--</span></div>
+        <div class="card"><h3>Activity Status</h3><span id="dashActivity">--</span></div>
+        <div class="card"><h3>Mood</h3><span id="dashMood">--</span></div>
+      </div>
+    </div>
+
+    <!-- Daily Input -->
+    <div id="dailyInput" class="page">
+      <div class="header">
+        <h2>Daily Health Input</h2>
+        <p>Enter lifestyle values</p>
+      </div>
+
+      <div class="form-box">
+        <label>Sleep Hours: <span id="sleepVal">6</span></label>
+        <input type="range" min="0" max="10" value="6"
+          oninput="updateValue('sleepVal', this.value)">
+
+        <label>Water Glasses: <span id="waterVal">5</span></label>
+        <input type="range" min="0" max="12" value="5"
+          oninput="updateValue('waterVal', this.value)">
+
+        <label>Activity Minutes: <span id="activityVal">30</span></label>
+        <input type="range" min="0" max="120" value="30"
+          oninput="updateValue('activityVal', this.value)">
+
+        <label>Stress Level: <span id="stressVal">3</span></label>
+        <input type="range" min="1" max="5" value="3"
+          oninput="updateValue('stressVal', this.value)">
+
+        <!-- Mood Dropdown -->
+        <label>Mood Today: <span id="moodVal">Happy</span></label>
+        <select id="moodSelect"
+          onchange="document.getElementById('moodVal').innerText=this.value">
+          <option value="Happy">Happy 😊</option>
+          <option value="Neutral">Neutral 😐</option>
+          <option value="Sad">Sad 😔</option>
+          <option value="Anxious">Anxious 😟</option>
+        </select>
+
+        <button onclick="analyzeWithAI()">Analyze Health</button>
+      </div>
+    </div>
+
+    <!-- AI Insights -->
+    <div id="aiInsights" class="page">
+      <div class="header">
+        <h2>AI Insights</h2>
+        <p>Offline Smart Health Report</p>
+      </div>
+
+      <div id="aiOutput" class="ai-card">
+        Waiting for analysis...
+      </div>
+    </div>
+
+    <!-- Reports -->
+    <div id="reports" class="page">
+      <div class="header">
+        <h2>Reports History</h2>
+        <p>Your last health analyses</p>
+      </div>
+
+      <div id="reportHistory">
+        No reports yet. Analyze health first.
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div id="settings" class="page">
+      <div class="header">
+        <h2>Settings</h2>
+        <p>Customize theme</p>
+      </div>
+
+      <div class="form-box">
+        <button onclick="toggleDarkMode()">🌙 Toggle Dark Mode</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  let reports = [];
+
+  function login() {
+    document.getElementById("loginPage").style.display = "none";
+    document.getElementById("appPage").style.display = "flex";
+  }
+
+  function logout() {
+    location.reload();
+  }
+
+  function goToPage(pageId) {
+    document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+    document.getElementById(pageId).classList.add("active");
+  }
+
+  function updateValue(id, value) {
+    document.getElementById(id).innerText = value;
+  }
+
+  function analyzeWithAI() {
+    goToPage("aiInsights");
+
+    let sleep = Number(document.getElementById("sleepVal").innerText);
+    let water = Number(document.getElementById("waterVal").innerText);
+    let activity = Number(document.getElementById("activityVal").innerText);
+    let stress = Number(document.getElementById("stressVal").innerText);
+    let mood = document.getElementById("moodVal").innerText;
+
+    let score = 100;
+    let tips = [];
+
+    if (sleep < 6) { score -= 20; tips.push("Improve sleep (7–8 hrs)."); }
+    if (water < 6) { score -= 15; tips.push("Drink more water."); }
+    if (activity < 30) { score -= 15; tips.push("Increase physical activity."); }
+    if (stress >= 4) { score -= 20; tips.push("Reduce stress with meditation."); }
+
+    if (tips.length === 0) tips.push("Excellent lifestyle habits!");
+
+    let report =
+`Health Score: ${score}/100
+Sleep: ${sleep} hrs | Water: ${water} | Activity: ${activity} mins
+Stress: ${stress}/5 | Mood: ${mood}
+
+Suggestions:
+- ${tips.join("\n- ")}`;
+
+    document.getElementById("aiOutput").innerText = report;
+
+    /* ✅ Dashboard Update */
+    document.getElementById("dashScore").innerText = score + "/100";
+    document.getElementById("dashSleep").innerText = sleep < 6 ? "Low" : "Good";
+    document.getElementById("dashWater").innerText = water < 6 ? "Low" : "Normal";
+    document.getElementById("dashStress").innerText = stress >= 4 ? "High" : "Normal";
+    document.getElementById("dashActivity").innerText = activity < 30 ? "Low" : "Active";
+    document.getElementById("dashMood").innerText = mood;
+
+    /* Save Report */
+    reports.unshift(report);
+    if (reports.length > 5) reports.pop();
+    updateReports();
+  }
+
+  function updateReports() {
+    let container = document.getElementById("reportHistory");
+    container.innerHTML = "";
+
+    reports.forEach(r => {
+      let div = document.createElement("div");
+      div.className = "report-item";
+      div.innerText = r;
+      container.appendChild(div);
+    });
+  }
+
+  function toggleDarkMode() {
+    document.body.classList.toggle("dark");
+  }
+</script>
+
+</body>
+</html>
