@@ -1,4 +1,6 @@
-function analyzeWithAI() {
+//generate an API Key and use it 
+
+async function analyzeWithAI() {
 
   goToPage("aiInsights");
 
@@ -7,41 +9,79 @@ function analyzeWithAI() {
   let activity = Number(document.getElementById("activityVal").innerText);
   let stress = Number(document.getElementById("stressVal").innerText);
 
+  // Basic score logic (keep this)
   let score = 100;
-  let tips = [];
+  if (sleep < 6) score -= 20;
+  if (water < 6) score -= 15;
+  if (activity < 30) score -= 15;
+  if (stress >= 4) score -= 20;
 
-  if (sleep < 6) { score -= 20; tips.push("Improve sleep (7–8 hrs)."); }
-  if (water < 6) { score -= 15; tips.push("Drink more water."); }
-  if (activity < 30) { score -= 15; tips.push("Increase physical activity."); }
-  if (stress >= 4) { score -= 20; tips.push("Reduce stress with meditation."); }
+  // Prompt for AI
+  const prompt = `
+Analyze this lifestyle data and give short health advice:
 
-  if (tips.length === 0) tips.push("Excellent lifestyle habits!");
+Sleep: ${sleep} hours
+Water: ${water} glasses
+Activity: ${activity} minutes
+Stress Level: ${stress} out of 5
 
-  let report =
-`Health Score: ${score}/100
+Give:
+- 3 bullet point suggestions
+- Friendly tone
+`;
+
+  let aiText = "Analyzing your health data...";
+
+  try {
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${GOOGLE_API_KEY}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: prompt }]
+            }
+          ]
+        })
+      }
+    );
+
+    const data = await response.json();
+    aiText = data.candidates[0].content.parts[0].text;
+
+  } catch (error) {
+    aiText = "AI analysis failed. Please try again later.";
+    console.error(error);
+  }
+
+  // Final report
+  let report = `
+Health Score: ${score}/100
 
 Sleep: ${sleep} hrs
 Water: ${water} glasses
 Activity: ${activity} mins
 Stress: ${stress}/5
 
-Suggestions:
-- ${tips.join("\n- ")}`;
+AI Suggestions:
+${aiText}
+`;
 
   document.getElementById("aiOutput").innerText = report;
 
-
+  // Dashboard update
   document.getElementById("dashScore").innerText = score + "/100";
   document.getElementById("dashSleep").innerText = sleep < 6 ? "Low" : "Good";
   document.getElementById("dashWater").innerText = water < 6 ? "Low" : "Normal";
   document.getElementById("dashStress").innerText = stress >= 4 ? "High" : "Normal";
 
-  // Save report history
+  // Save history
   reports.unshift(report);
   if (reports.length > 5) reports.pop();
   updateReports();
 
-  // Optional: Auto back to dashboard
   setTimeout(() => {
     goToPage("dashboard");
   }, 2000);
